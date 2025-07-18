@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from .dice import Dice
+from entities import Dice, return_die_roll
+from functions import return_range, get_table_result
 import pandas as pd
 import numpy as np
 
@@ -35,9 +36,29 @@ class Point_of_Interest(ABC):
         :param discoverability_table:pd.DataFrame
         :param debug: bool, defaults to False
         """
+        if debug:
+            print(f"Point_of_Interest.__init__: discoverability_table| "
+                  f"{discoverability_table}, debug: {debug}.")
         table = discoverability_table
         cols = list(table.columns)
+        if debug:
+            print(f"Point_of_Interest.__init__: table: {table}")
+            print(f"Point_of_Interest.__init__: cols: {cols}.")
         die_size = int(cols[0][1:])
+        die = Dice(dice_size=die_size)
+        roll = die.roll()
+        result = get_table_result(table, roll)
+        if result is None:
+            error_msg = (f"Table format was invalid. No result could be "
+                         f"determined")
+            print(f"Point_of_Interest.__init__: {error_msg}")
+            raise ValueError(error_msg)
+        else:
+            self.discoverability = result
+        if debug:
+            print(f"Point_of_Interest.__init__: die_size: {die_size}. "
+                  f"die: {die}, roll: {roll}, result{result}.")
+
         self.debug = debug
 
 
