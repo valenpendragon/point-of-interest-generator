@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from entities import Dice, return_die_roll
-from functions import return_range, get_table_result
+from functions import return_range, get_table_result, get_dice_info
 import pandas as pd
 import numpy as np
 
@@ -44,8 +44,11 @@ class Point_of_Interest(ABC):
         if debug:
             print(f"Point_of_Interest.__init__: table: {table}")
             print(f"Point_of_Interest.__init__: cols: {cols}.")
-        die_size = int(cols[0][1:])
-        die = Dice(dice_size=die_size)
+        die_info = cols[0].lower()
+        if debug:
+            print(f"Point_of_Interest.__init__: die_info: {die_info}.")
+        die_no, die_size = get_dice_info(die_info, debug=debug)
+        die = Dice(dice_size=die_size, dice_number=die_no)
         roll = die.roll()
         result = get_table_result(table, roll)
         if result is None:
@@ -77,6 +80,6 @@ class Adventure_Site(Point_of_Interest):
         if debug:
             print(f"Adventure_Site: discoverability: {discoverability_table}. "
                   f"debug: {debug}")
-        super().__init__(discoverability_table, debug)
+        super().__init__(discoverability_table, debug=debug)
         self.next_action = next_action
 

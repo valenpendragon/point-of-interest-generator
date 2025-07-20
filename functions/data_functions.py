@@ -36,6 +36,7 @@ def get_table_result(table: pd.DataFrame, roll: int, result_col_header='Results'
     roll_col = table[roll_col_name]
     if len(col_names) == 2:
         result_col_name = col_names[1]
+        result_col = table[result_col_name]
     elif len(col_names) < 2:
         print(f"get_table_result: table has incorrect format. Retuning None.")
         return None
