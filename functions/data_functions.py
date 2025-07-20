@@ -110,10 +110,15 @@ def get_dice_info(s, debug=False):
             n = int(l[0])
         except ValueError:
             raise ValueError(error_msg)
+    if debug:
+        print(f"get_dice_info: n {n}.")
     try:
         m = int(l[1])
     except ValueError:
         raise ValueError(error_msg)
+    if debug:
+        print(f"get_dice_info: m {m}.")
+
     return (n, m)
 
 
@@ -121,6 +126,6 @@ if __name__ == "__main__":
     l = ['2d10', 'D20', 'd12', '3D8']
     for s in l:
         print(f"main: Testing {s}.")
-        no_of_dice, die_size = get_dice_info(s)
+        no_of_dice, die_size = get_dice_info(s, debug=True)
         print(f"main: no_of_dice: {no_of_dice}, die_size: {die_size}.")
     print(f"main: End of testing get_dice_info() function.")
