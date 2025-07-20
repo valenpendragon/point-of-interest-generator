@@ -34,7 +34,6 @@ def get_table_result(table: pd.DataFrame, roll: int, result_col_header='Results'
     col_names = list(table.columns)
     roll_col_name = col_names[0]
     roll_col = table[roll_col_name]
-
     if len(col_names) == 2:
         result_col_name = col_names[1]
     elif len(col_names) < 2:
@@ -79,3 +78,49 @@ def get_table_result(table: pd.DataFrame, roll: int, result_col_header='Results'
     print(f"get_table_result: result: {result}.")
     return result
 
+
+def get_dice_info(s, debug=False):
+    """
+    This function requires a string in the following format:
+        1) ndm or nDm, where n and m are integers and d/D are those characters
+        2) dm or Dm, where m is an integer and d/D are those characters
+    For case 1), it will return (n, m). For case 2), it will return (1, m).
+    Otherwise, it will raise a ValueError.
+    :param s: str
+    :param debug: bool, controls print output of debug messages
+    :return: tuple of int, (n, m)  or (1, m)
+    """
+    error_msg = (f"Format of the string, {s}, is invalid.\n"
+                 f"Correct format is 'ndm' or 'dm, where n and m are integers "
+                 f"and d is case-insensitive character d.")
+    die_info = s.lower()
+    if debug:
+        print(f"get_dice_info: die_info: {die_info}.")
+    if 'd' not in die_info:
+        raise ValueError(error_msg)
+
+    l = die_info.split('d')
+    if debug:
+        print(f"get_dice_info: l {l}.")
+    if l[0] == "":
+        # There is no first integer.
+        n = 1
+    else:
+        try:
+            n = int(l[0])
+        except ValueError:
+            raise ValueError(error_msg)
+    try:
+        m = int(l[1])
+    except ValueError:
+        raise ValueError(error_msg)
+    return (n, m)
+
+
+if __name__ == "__main__":
+    l = ['2d10', 'D20', 'd12', '3D8']
+    for s in l:
+        print(f"main: Testing {s}.")
+        no_of_dice, die_size = get_dice_info(s)
+        print(f"main: no_of_dice: {no_of_dice}, die_size: {die_size}.")
+    print(f"main: End of testing get_dice_info() function.")
