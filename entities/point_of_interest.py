@@ -5,9 +5,9 @@ import pandas as pd
 import numpy as np
 
 
-class Point_of_Interest(ABC):
+class PointOfInterest(ABC):
     """
-    This abstract class creates the basic framework for Point_of_Interest
+    This abstract class creates the basic framework for PointOfInterest
     objects. These are places that could be used to create steps in an
     RPG quest cycle, start a whole new one, or add milieu to a world.
 
@@ -37,37 +37,53 @@ class Point_of_Interest(ABC):
         :param debug: bool, defaults to False
         """
         if debug:
-            print(f"Point_of_Interest.__init__: discoverability_table| "
+            print(f"PointOfInterest.__init__: discoverability_table| "
                   f"{discoverability_table}, debug: {debug}.")
-        table = discoverability_table
-        cols = list(table.columns)
+        self.discoverability_table = discoverability_table
+        cols = list(self.discoverability_table.columns)
         if debug:
-            print(f"Point_of_Interest.__init__: table: {table}")
-            print(f"Point_of_Interest.__init__: cols: {cols}.")
+            print(f"PointOfInterest.__init__: table: {self.discoverability_table}")
+            print(f"PointOfInterest.__init__: cols: {cols}.")
         die_info = cols[0].lower()
         if debug:
-            print(f"Point_of_Interest.__init__: die_info: {die_info}.")
+            print(f"PointOfInterest.__init__: die_info: {die_info}.")
         die_no, die_size = get_dice_info(die_info, debug=debug)
         die = Dice(dice_size=die_size, dice_number=die_no)
         roll = die.roll()
-        result = get_table_result(table, roll)
+        result = get_table_result(self.discoverability_table, roll)
         if result is None:
             error_msg = (f"Table format was invalid. No result could be "
                          f"determined")
-            print(f"Point_of_Interest.__init__: {error_msg}")
+            print(f"PointOfInterest.__init__: {error_msg}")
             raise ValueError(error_msg)
         else:
             self.discoverability = result
         if debug:
-            print(f"Point_of_Interest.__init__: die_size: {die_size}. "
+            print(f"PointOfInterest.__init__: die_size: {die_size}. "
                   f"die: {die}, roll: {roll}, result{result}.")
 
         self.debug = debug
+        
+    @abstractmethod
+    def __str__(self):
+        """
+        Each version of __str__() has to be different due to changing attributes.
+        :return: str
+        """
+        pass
+    
+    @abstractmethod
+    def __repr__(self):
+        """
+        Each version __repr__() has to be difference due to changing attributes.
+        :return: str
+        """
+        pass
 
 
-class Adventure_Site(Point_of_Interest):
+class AdventureSite(PointOfInterest):
     """
-    This subclass of Point_of_Interest generates the simplest type of POI.
+    This subclass of PointOfInterest generates the simplest type of POI:
     an adventure site.
     """
     def __init__(self, discoverability_table: pd.DataFrame, next_action='create workup', debug=False):
@@ -78,8 +94,21 @@ class Adventure_Site(Point_of_Interest):
         :param debug: bool, defaults to False
         """
         if debug:
-            print(f"Adventure_Site: discoverability: {discoverability_table}. "
+            print(f"AdventureSite: discoverability: {discoverability_table}. "
                   f"debug: {debug}")
         super().__init__(discoverability_table, debug=debug)
         self.next_action = next_action
-
+        
+    def __str__(self):
+        output = f"discoverability: {self.discoverability}\n" \
+                 f"next_action: {self.next_action}\n" \
+                 f"discoverability_table: {self.discoverability_table}"
+        return output
+    
+    def __repr__(self):
+        output = (f"AdventureSite(pd.DataFrame(dict(d2= ['1-2'], "
+                  f"results=[\'{self.discoverability}\']), index=None), "
+                  f"next_action=\'{self.next_action}\', "
+                  f"debug={self.debug})")
+        return output
+        
