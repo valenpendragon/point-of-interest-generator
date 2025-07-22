@@ -111,4 +111,19 @@ class AdventureSite(PointOfInterest):
                   f"next_action=\'{self.next_action}\', "
                   f"debug={self.debug})")
         return output
-        
+
+
+if __name__ == "__main__":
+    print(f"main: Beginning testing")
+    debug = True
+    ws_name = "POI Discoverability"
+    fp = "../data_orig/tables.xlsx"
+    discoverability_table = pd.read_excel(fp, sheet_name=ws_name, index_col=None, na_values=True)
+    adv01 = AdventureSite(discoverability_table, debug=debug)
+    adv02 = AdventureSite(discoverability_table, next_action="testing", debug=debug)
+    print(f"main: Printing tests:")
+    print(f"main: adv01: {adv01}")
+    print(f"main: adv02: {adv02}")
+    print(f"main: Repr tests:")
+    print(f"main: adv01: {repr(adv01)}")
+    print(f"main: adv02: {repr(adv02)}")
