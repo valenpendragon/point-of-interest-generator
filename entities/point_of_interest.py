@@ -80,6 +80,34 @@ class PointOfInterest(ABC):
         """
         pass
 
+    def redo_discoverability(self):
+        """
+        This method uses the attribute self.discoverability_table to rerun
+        the assignment of self.discoverability. All changes are internal.
+        :return:
+        """
+        cols = self.discoverability_table.columns
+        if self.debug:
+            print(f"PointOfInterest.redo_discoverability: cols: {cols}.")
+        die_info = cols[0].lower()
+        if self.debug:
+            print(f"PointOfInterest.redo_discoverability: die_info: {die_info}.")
+        die_no, die_size = get_dice_info(die_info, debug=debug)
+        die = Dice(dice_size=die_size, dice_number=die_no)
+        roll = die.roll()
+        result = get_table_result(self.discoverability_table, roll)
+        if self.debug:
+            print(f"PointOfInterest.redo_discoverability: die_size: "
+                  f"{die_size}. die: {die}, roll: {roll}, result{result}.")
+        if result is None:
+            error_msg = (f"Table format was invalid. No result could be "
+                         f"determined")
+            print(f"PointOfInterest.redo_discoverability: {error_msg}")
+            raise ValueError(error_msg)
+        else:
+            self.discoverability = result
+
+
 
 class AdventureSite(PointOfInterest):
     """
