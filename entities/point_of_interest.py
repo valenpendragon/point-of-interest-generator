@@ -141,6 +141,103 @@ class AdventureSite(PointOfInterest):
         return output
 
 
+class DivinePOI(PointOfInterest):
+    """
+    This class generates Divine Points of Interest using 3 tables from the
+    file, tables.xlsx, 'Divine POI', 'Current Divine Factions', and 'Divine
+    Faction Action'. Divine POI determines the type of location; Current
+    Divine Factions determines the faction that controls/owns the location;
+    and Divine Faction Action determines if this location needs a new faction
+    created, use existing faction, or make an off-shoot.
+
+    The new attributes for this class are:
+        next_action: str
+        location_type: str
+        faction: str
+        divine_poi_table: pd.DataFrame
+        divine_factions_table: pd.DataFrame
+        divine_factions_action_table: pd.DataFrame
+    The tables are stored in case the GM or user needs to reroll the results.
+
+    The format of Divine POI and Divine Faction Action tables are the same as
+    the format for POI Discoverability for PointOFInterest parent class. The
+    format for the Current Divine Factions table requires the same first
+    column as the other tables, but there can be up three (3) results,
+    columns 2 through 4. Column 2 must be headed 'Faction'. The optional
+    remaining columns can have any heading. They will be appended to the
+    faction result for more complete information. All result columns must be
+    strings.
+    """
+    def __init__(self,
+                 discoverability_table: pd.DataFrame,
+                 divine_poi_table: pd.DataFrame,
+                 divine_factions_table: pd.DataFrame,
+                 divine_factions_action_table: pd.DataFrame,
+                 debug=False):
+        """
+        This method requires 4 pd.Dataframes to generate its attributes:
+        next_action, location_type, and faction. These tables are stored
+        as attributes to allow a redo of any attribute. debug controls
+        the behavior of output messages.
+        :param discoverability_table: pd.Dataframe
+        :param divine_poi_table: pd.Dataframe
+        :param divine_factions_table: pd.Dataframe
+        :param divine_factions_action_table: pd.Dataframe
+        :param debug: bool
+        """
+        super.__init__(discoverability_table, debug=debug)
+        self.divine_poi_table = divine_poi_table
+        self.divine_factions_table = divine_factions_table
+        self.divine_factions_action_table = divine_factions_action_table
+        if self.debug:
+            print(f"DivinePOI:__init__: diving_poi_table: {self.divine_poi_table}")
+            print(f"DivinePOI:__init__: divine_factions_table: {self.divine_factions_table}")
+            print(f"DivinePOI:__init__: divine_factions_action_table: "
+                  f"{self.divine_factions_action_table}")
+        results = []
+        for table in [self.divine_poi_table, self.divine_factions_table,
+                      self.divine_factions_action_table]:
+            if self.debug:
+                print(f"DivinePOI.__init__: Collecting results, starting with table, {table}.")
+            cols = table.columns
+            die_info = cols[0].lower()
+            if self.debug:
+                print(f"DivinePOI.__init__: die_info: {die_info}.")
+            die_no, die_size = get_dice_info(die_info, debug=self.debug)
+            die = Dice(dice_size=die_size, dice_number=die_no)
+            roll = die.roll()
+            if len(cols) > 2:
+                result = get_multicolumn_table_result(table)
+            else:
+                result = get_table_result(table, cols[2], debug=debug)
+            if self.debug:
+                print(f"DivinePOI.__init__: result: {result}.")
+            results.append(result)
+            if self.debug:
+                print(f"DivinePOI.__init__: results: {results}")
+        # Now, results[0] is the result from divine POI table, results[1]
+        # is the result from divine factions table, and results[2] is the
+        # result from the divine factions action table.
+        self.location_type = results[0]
+        self.faction = results[1]
+        self.next_action = results[2]
+        if self.debug:
+            print(f"DivinePOI.__init__: location: {self.location_type}. "
+                  f"faction: {self.faction}. next_acton: {self.next_action}")
+            print(f"DivinePOI.__init__: init completed.")
+
+    def __str__(self):
+        output = f"discoverability: {self.discoverability}\n" \
+                 f"discoverability_table: {self.discoverability_table}\n" \
+                 f"location_type: {self.location_type}\n" \
+                 f"divine_poi_table : {self.divine_poi_table}\n" \
+                 f"faction: {self.faction}\n" \
+                 f"divine_factions_table: {self.divine_factions_table}\n" \
+                 f"next_action: {self.next_action}\n" \
+                 f"divine_factions_action_table: " \
+                 f"{self.divine_factions_action_table}"
+        return output
+
 if __name__ == "__main__":
     print(f"main: Beginning testing")
     debug = True
