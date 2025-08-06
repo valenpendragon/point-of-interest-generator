@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from entities import Dice, return_die_roll
-from functions import return_range, get_table_result, get_dice_info
+from functions import return_range, get_table_result, get_dice_info, get_multicolumn_table_result
 import pandas as pd
 import numpy as np
 
