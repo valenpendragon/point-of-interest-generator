@@ -80,6 +80,10 @@ def get_table_result(table: pd.DataFrame, roll: int, result_col_header='Results'
     return result
 
 
+def get_multicolumn_table_result(table: pd.DataFrame):
+    pass
+
+
 def get_dice_info(s, debug=False):
     """
     This function requires a string in the following format:
